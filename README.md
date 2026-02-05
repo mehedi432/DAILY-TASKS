@@ -3,146 +3,130 @@ A REPO FOR COPYING HOME SERVER DATA TO OF SERVER
 Scrpt for automatically fetch and arrange production report with MD Sir & CM Sir Format.
 ```
 function main(workbook: ExcelScript.Workbook) {
-    let sourceSheet = workbook.getWorksheet("Today,Total & Balance");
-    let dailySummary = workbook.getWorksheet("Daily Summary");
-    let mdfpSheet = workbook.getWorksheet("MDFP-WC6-2ND");
+  let sourceSheet = workbook.getWorksheet("Today,Total & Balance");
+  let dailySummary = workbook.getWorksheet("Daily Summary");
 
-    if (!sourceSheet) return;
+  if (!sourceSheet) return;
+  if (!dailySummary) {
+    dailySummary = workbook.addWorksheet("Daily Summary");
+  } else {
+    dailySummary.getUsedRange()?.clear();
+  }
 
-    if (!dailySummary) {
-        dailySummary = workbook.addWorksheet("Daily Summary");
-    } else {
-        dailySummary.getUsedRange()?.clear();
+  // Set solid white background
+  dailySummary.getRange("A1:Z2000").getFormat().getFill().setColor("FFFFFF");
+
+  let sourceValues: (string | number | boolean)[][] = sourceSheet.getUsedRange().getValues();
+  let buyers: string[] = ["PAAYRA", "PEPCO"];
+  let finalReportRows: (string | number | boolean)[][] = [];
+  let slNo: number = 1;
+
+  // Global Totals for Grand Total
+  let gQty = 0, gKnit = 0, gLink = 0, gMend = 0, gWash = 0, gPoly = 0;
+
+  // 1. DATA GATHERING
+  buyers.forEach((buyer: string) => {
+    let buyerData = sourceValues.filter(row =>
+      String(row[0]).toUpperCase().indexOf(buyer.toUpperCase()) !== -1
+    );
+
+    if (buyerData.length > 0) {
+      let bQty = 0, bKnit = 0, bLink = 0, bMend = 0, bWash = 0, bPoly = 0;
+
+      buyerData.forEach((row) => {
+        let qty = Number(row[3]) || 0;
+        let knit = Number(row[7]) || 0;
+        let link = Number(row[11]) || 0;
+        let mend = Number(row[19]) || 0;
+        let wash = Number(row[23]) || 0;
+        let poly = Number(row[27]) || 0;
+
+        finalReportRows.push([
+          slNo++, "", String(row[2]), String(row[1]), String(row[4]), "50% COT/ACR",
+          qty, "29.03.26", "APPROVED", String(row[5]), knit, link, mend, wash, poly,
+          "YES", "DONE", qty > 0 ? Math.round((poly / qty) * 100) : 0
+        ]);
+
+        bQty += qty; bKnit += knit; bLink += link; bMend += mend; bWash += wash; bPoly += poly;
+      });
+
+      // ALIGNED BUYER TOTAL ROW
+      let tRow: (string | number | boolean)[] = new Array(18).fill("");
+      tRow[0] = buyer + " TOTAL";
+      tRow[6] = bQty; tRow[10] = bKnit; tRow[11] = bLink; tRow[12] = bMend; tRow[13] = bWash; tRow[14] = bPoly;
+      tRow[17] = "BAL: " + (bQty - bPoly);
+      finalReportRows.push(tRow);
+
+      // Add to Grand Totals
+      gQty += bQty; gKnit += bKnit; gLink += bLink; gMend += bMend; gWash += bWash; gPoly += bPoly;
     }
+  });
 
-    // Clean Background for that Premium Look
-    dailySummary.getRange("A1:Z2000").getFormat().getFill().setColor("FFFFFF");
+  // ADD GRAND TOTAL ROW AT THE VERY END
+  let grandTotalRow: (string | number | boolean)[] = new Array(18).fill("");
+  grandTotalRow[0] = "GRAND TOTAL (ALL BUYERS)";
+  grandTotalRow[6] = gQty; grandTotalRow[10] = gKnit; grandTotalRow[11] = gLink; grandTotalRow[12] = gMend; grandTotalRow[13] = gWash; grandTotalRow[14] = gPoly;
+  grandTotalRow[17] = "TOTAL BAL: " + (gQty - gPoly);
+  finalReportRows.push(grandTotalRow);
 
-    let sourceValues: (string | number | boolean)[][] = sourceSheet.getUsedRange().getValues();
-    
-    // Exact Header Sequence from your Image
-    const headers: string[][] = [["SL No", "IMAGE", "FACTORY", "STYLE", "GG", "COMPOSITION", "ORDER QTY", "EX-FTY DATE", "PPS", "M/C", "KNIT", "LINK", "MEND", "WASH", "POLY", "BTB L/C", "DYEING ORDER", "REMARKS"]];
+  // 2. DASHBOARD TOP SECTION
+  let titleRange = dailySummary.getRange("A1");
+  titleRange.setValue("EXECUTIVE PRODUCTION DASHBOARD");
+  titleRange.getFormat().getFont().setBold(true);
+  titleRange.getFormat().getFont().setSize(16);
 
-    let finalReportRows: (string | number | boolean)[][] = [];
-    let buyers: string[] = ["PAAYRA", "PEPCO"];
-    let slNo: number = 1;
+  dailySummary.getRange("A2").setValue("TOTAL PACKED:");
+  let packVal = dailySummary.getRange("B2");
+  packVal.setValue(gQty > 0 ? gPoly / gQty : 0);
+  packVal.setNumberFormat("0.0%");
 
-    // 1. BUYER-DRIVEN DATA FETCHING
-    buyers.forEach((buyer: string) => {
-        // Collect ALL rows for this buyer
-        let buyerData = sourceValues.filter(row => 
-            String(row[0]).toUpperCase().indexOf(buyer.toUpperCase()) !== -1
-        );
+  // 3. MAIN TABLE HEADERS
+  const headers: string[][] = [["SL No", "IMAGE", "FACTORY", "STYLE", "GG", "COMP", "ORDER QTY", "EX-FTY", "PPS", "M/C", "KNIT", "LINK", "MEND", "WASH", "POLY", "L/C", "DYEING", "PROGRESS %"]];
+  let headerRange = dailySummary.getRange("A4:R4");
+  headerRange.setValues(headers);
+  headerRange.getFormat().getFill().setColor("#2D2D2D");
+  headerRange.getFormat().getFont().setColor("FFFFFF");
+  headerRange.getFormat().getFont().setBold(true);
 
-        if (buyerData.length > 0) {
-            let bQty = 0, bKnit = 0, bLink = 0, bMend = 0, bWash = 0, bPoly = 0;
-            let startedRows: (string | number | boolean)[][] = [];
-            let pendingRows: (string | number | boolean)[][] = [];
+  // 4. DATA INSERTION AND VISIBLE LINES
+  if (finalReportRows.length > 0) {
+    let dataRange = dailySummary.getRange("A5").getResizedRange(finalReportRows.length - 1, 17);
+    dataRange.setValues(finalReportRows);
 
-            // Sort by status (Started vs Not Started)
-            buyerData.forEach((row) => {
-                let knit = Number(row[7]) || 0;
-                let poly = Number(row[27]) || 0;
-                if (knit === 0 && poly === 0) {
-                    pendingRows.push(row);
-                } else {
-                    startedRows.push(row);
-                }
-            });
+    for (let i = 0; i < finalReportRows.length; i++) {
+      let rIdx = i + 5;
+      let rowRange = dailySummary.getRange(`A${rIdx}:R${rIdx}`);
+      
+      // Apply Grid Borders (Inside Horizontal and Vertical)
+      let hBorders = rowRange.getFormat().getRangeBorder(ExcelScript.BorderIndex.insideHorizontal);
+      hBorders.setStyle(ExcelScript.BorderLineStyle.continuous);
+      hBorders.setColor("#BDBDBD");
+      
+      let vBorders = rowRange.getFormat().getRangeBorder(ExcelScript.BorderIndex.insideVertical);
+      vBorders.setStyle(ExcelScript.BorderLineStyle.continuous);
+      vBorders.setColor("#BDBDBD");
 
-            // Add Styles with Production Activity
-            startedRows.forEach((row) => {
-                let qty = Number(row[3]) || 0;
-                let knit = Number(row[7]) || 0;
-                let poly = Number(row[27]) || 0;
-
-                finalReportRows.push([
-                    slNo++, "", String(row[2]), String(row[1]), String(row[4]), 
-                    "50% COTTON 50% ACRYLIC", qty, "29.03.26", "APPROVED", 
-                    String(row[5]), knit, Number(row[11]) || 0, Number(row[19]) || 0, 
-                    Number(row[23]) || 0, poly, "YARN IN HOUSE", "FRI-22.12.25", "IN PRODUCTION"
-                ]);
-                bQty += qty; bKnit += knit; bPoly += poly;
-                // Add Link/Mend/Wash to totals if needed
-                bLink += (Number(row[11]) || 0);
-                bMend += (Number(row[19]) || 0);
-                bWash += (Number(row[23]) || 0);
-            });
-
-            // Add "Pending" Separator and Rows
-            if (pendingRows.length > 0) {
-                finalReportRows.push(["--- " + buyer + " PENDING ORDERS ---", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]);
-                pendingRows.forEach((row) => {
-                    let qty = Number(row[3]) || 0;
-                    finalReportRows.push([slNo++, "", String(row[2]), String(row[1]), String(row[4]), "50% COTTON 50% ACRYLIC", qty, "29.03.26", "APPROVED", String(row[5]), 0, 0, 0, 0, 0, "YARN IN HOUSE", "FRI-22.12.25", "WAITING"]);
-                    bQty += qty;
-                });
-            }
-
-            // Buyer Sub-Total Row
-            finalReportRows.push([buyer + " TOTAL", "", "", bQty, "", "", bKnit, bLink, bMend, bWash, bPoly, (bQty - bPoly), "", "", "", "", "", ""]);
-        }
-    });
-
-    // 2. OUTPUT & BILLION DOLLAR STYLING
-    dailySummary.getRange("A4:R4").setValues(headers);
-    let headerRange = dailySummary.getRange("A4:R4");
-    headerRange.getFormat().getFill().setColor("#2D2D2D"); // Slate Gray
-    headerRange.getFormat().getFont().setColor("#FFFFFF");
-    headerRange.getFormat().getFont().setBold(true);
-
-    if (finalReportRows.length > 0) {
-        let dataRange = dailySummary.getRange("A5").getResizedRange(finalReportRows.length - 1, 17);
-        dataRange.setValues(finalReportRows);
-        dataRange.getFormat().getFont().setName("Segoe UI");
-
-        finalReportRows.forEach((row, idx) => {
-            let rIdx = idx + 5;
-            let rowRange = dailySummary.getRange(`A${rIdx}:R${rIdx}`);
-            
-            // Zebra Striping
-            if (idx % 2 === 0) rowRange.getFormat().getFill().setColor("#F9F9F9");
-
-            // Total Row Style
-            if (String(row[0]).indexOf("TOTAL") !== -1) {
-                rowRange.getFormat().getFill().setColor("#E8E8E8");
-                rowRange.getFormat().getFont().setBold(true);
-                rowRange.getFormat().getRangeBorder(ExcelScript.BorderIndex.edgeTop).setStyle(ExcelScript.BorderLineStyle.continuous);
-            }
-
-            // Pending Separator Style
-            if (String(row[0]).indexOf("PENDING") !== -1) {
-                rowRange.getFormat().getFill().setColor("#FFF9E6");
-                rowRange.getFormat().getFont().setItalic(true);
-                rowRange.getFormat().getHorizontalAlignment(ExcelScript.HorizontalAlignment.center);
-            }
-        });
+      // Shade Sub-Totals and Grand Total
+      let firstCell = String(finalReportRows[i][0]);
+      if (firstCell.indexOf("TOTAL") !== -1) {
+        rowRange.getFormat().getFill().setColor("#F2F2F2");
+        rowRange.getFormat().getFont().setBold(true);
+      }
+      if (firstCell.indexOf("GRAND TOTAL") !== -1) {
+        rowRange.getFormat().getFill().setColor("#D9EAD3"); // Light Green for Grand Total
+      }
     }
-
-    // 3. AUTO-SYNC MDFP SHEET (Design Safe)
-    if (mdfpSheet) {
-        let mdfpRange = mdfpSheet.getUsedRange();
-        let mdfpValues = mdfpRange.getValues();
-        for (let i = 0; i < mdfpValues.length; i++) {
-            let mStyle = String(mdfpValues[i][3]).replace(/\s/g, "").toUpperCase();
-            if (mStyle.length > 4) {
-                let match = sourceValues.find(row => String(row[1]).replace(/\s/g, "").toUpperCase().indexOf(mStyle) !== -1);
-                if (match) {
-                    mdfpSheet.getRangeByIndexes(i, 9, 1, 6).setValues([[match[5], match[7], match[11], match[19], match[23], match[27]]]);
-                }
-            }
-        }
-    }
-
-    // Finishing Touches
-    let tableRange = dailySummary.getRange("A4").getSurroundingRegion();
-    tableRange.getFormat().getRangeBorder(ExcelScript.BorderIndex.insideHorizontal).setStyle(ExcelScript.BorderLineStyle.continuous);
-    tableRange.getFormat().getRangeBorder(ExcelScript.BorderIndex.insideHorizontal).setColor("#E0E0E0");
     
-    dailySummary.getUsedRange().getFormat().autofitColumns();
-    dailySummary.getRange("B:B").getFormat().setColumnWidth(75); // For Images
-    
-    console.log("Complete Buyer-Driven Report Generated. No Styles Missed.");
+    dailySummary.getRange("R5").getResizedRange(finalReportRows.length - 1, 0).setNumberFormat("0'%'");
+  }
+
+  // --- THE CORRECT FIX FOR COLUMN WIDTH ---
+  dailySummary.getUsedRange().getFormat().autofitColumns();
+  dailySummary.getRange("B:B").getFormat().setColumnWidth(70); // Access .getFormat() first
+  
+  // Set Alignment
+  let fullTable = dailySummary.getRange("A4").getSurroundingRegion();
+  fullTable.getFormat().setVerticalAlignment(ExcelScript.VerticalAlignment.center);
 }
 ```
 
