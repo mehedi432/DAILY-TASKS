@@ -147,7 +147,7 @@ function main(workbook: ExcelScript.Workbook) {
 ```
 
 # Sample Yarn Tag
-<code>
+```
 <style>
 @page {
   size: A4;
@@ -334,4 +334,4 @@ body {
   </div>
 
 </div>
-</code>
+```
