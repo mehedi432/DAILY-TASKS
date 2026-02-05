@@ -1,7 +1,7 @@
 # DAILY-TASKS
 A REPO FOR COPYING HOME SERVER DATA TO OF SERVER
 Scrpt for automatically fetch and arrange production report with MD Sir & CM Sir Format.
-<code>
+```
 function main(workbook: ExcelScript.Workbook) {
     let sourceSheet = workbook.getWorksheet("Today,Total & Balance");
     let dailySummary = workbook.getWorksheet("Daily Summary");
@@ -144,7 +144,7 @@ function main(workbook: ExcelScript.Workbook) {
     
     console.log("Complete Buyer-Driven Report Generated. No Styles Missed.");
 }
-</code>
+```
 
 # Sample Yarn Tag
 <code>
