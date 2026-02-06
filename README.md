@@ -319,3 +319,293 @@ body {
 
 </div>
 ```
+ASSET TRANSFER ACKNOWLEDGEMENT -
+```
+<style>
+    @page {
+        size: A4 portrait;
+        margin: 20mm;
+    }
+
+    .letter-wrapper {
+        font-family: 'Inter', 'Hind Siliguri', sans-serif;
+        color: #000;
+        line-height: 1.5;
+    }
+
+    /* RESTORED: Your Preferred Header Styles */
+    .header-table {
+        width: 100%;
+        border-bottom: 2.5px solid #000;
+        padding-bottom: 21px;
+        margin-bottom: 34px;
+        border-collapse: collapse;
+    }
+
+    .company-identity {
+        display: flex;
+        align-items: center;
+        gap: 21px;
+    }
+
+    .logo-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 55px;
+        width: auto;
+    }
+
+    .logo-img {
+        max-height: 55px;
+        width: auto;
+        display: block;
+    }
+
+    .company-title {
+        font-size: 21px;
+        font-weight: 800;
+        letter-spacing: -0.8px;
+        text-transform: uppercase;
+        line-height: 1.1;
+    }
+
+    .document-label {
+        text-align: right;
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        line-height: 1.4;
+    }
+
+    /* Meta Information Bar */
+    .meta-bar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 40px;
+        font-size: 12px;
+    }
+
+    .section-heading {
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+        display: block;
+        border-bottom: 1.5px solid #000;
+        padding-bottom: 3px;
+    }
+
+    .undertaking-text {
+        font-size: 13px;
+        text-align: justify;
+        font-weight: 400;
+        color: #000;
+    }
+
+    /* NEW: Billion-Dollar Professional Table Styling */
+    .specs-table {
+        width: 100%;
+        border: 2px solid #555;
+        border-collapse: collapse;
+        margin-top: 21px;
+        margin-bottom: 34px;
+        table-layout: fixed;
+    }
+
+    .specs-table thead th {
+        background: #888;
+        color: #fff;
+        text-align: center;
+        padding: 13px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border: 1px solid #000;
+    }
+
+    .specs-table td {
+        padding: 13px 15px;
+        border: 1px solid #000;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .label-cell {
+        font-weight: 800;
+        width: 34%;
+        background: #f2f2f2;
+        text-transform: uppercase;
+        font-size: 10px !important;
+        color: #000;
+        letter-spacing: 0.5px;
+    }
+
+    .value-cell {
+        font-weight: 500;
+        color: #000;
+        background: #ffffff;
+    }
+
+    .desc-label {
+        font-size: 8px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #000;
+        margin-bottom: 8px;
+        display: block;
+        text-decoration: underline;
+    }
+
+    /* Signatures */
+    .signature-row {
+        margin-top: 110px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .sig-block {
+        width: 220px;
+        text-align: center;
+        border-top: 2px solid #000;
+        padding-top: 10px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .footer-reference {
+        margin-top: 70px;
+        font-size: 8px;
+        color: #666;
+        text-align: center;
+        border-top: 1px solid #eee;
+        padding-top: 10px;
+    }
+</style>
+
+{# --- DYNAMIC LOGIC --- #}
+{% set item_desc = frappe.db.get_value("Item", doc.item_code, "description") if doc.item_code else "" %}
+{% set emp_name = frappe.db.get_value("Employee", doc.custodian, "employee_name") if doc.custodian else "N/A" %}
+{% set emp_des = frappe.db.get_value("Employee", doc.custodian, "designation") if doc.custodian else "" %}
+{% set base_url = frappe.utils.get_url() %}
+
+<div class="letter-wrapper">
+    <table class="header-table">
+        <tr>
+            <td style="width: 70%;">
+                <div class="company-identity">
+                    <div class="logo-container">
+                        <img src="{{ base_url }}/files/logo_meek-01.png" class="logo-img" alt="LOGO">
+                    </div>
+                    <div>
+                        <div class="company-title">{{ doc.company }}</div>
+                        <div style="font-size: 10px; font-weight: 500; color: #444;">CORPORATE ASSET GOVERNANCE</div>
+                    </div>
+                </div>
+            </td>
+            <td class="document-label">
+                সম্পদ গ্রহণ ও অঙ্গীকারনামা<br>
+                <span style="font-size: 8px; font-weight: 400; color: #555;">ASSET HANDOVER & UNDERTAKING</span>
+            </td>
+        </tr>
+    </table>
+
+    <div class="meta-bar">
+        <div style="width: 48%;">
+            <span class="section-heading">কর্মচারীর তথ্য (Employee Details)</span>
+            <div style="line-height: 1.8;">
+                <b>নাম:</b> {{ emp_name }}<br>
+                <b>আইডি:</b> {{ doc.custodian or "---" }}<br>
+                <b>পদবী:</b> {{ emp_des }}<br>
+                <b>বিভাগ:</b> {{ doc.department or "---" }}
+            </div>
+        </div>
+        <div style="width: 48%; text-align: right;">
+            <span class="section-heading">নথি তথ্য (Document Reference)</span>
+            <div style="line-height: 1.8;">
+                <b>রেফারেন্স নং:</b> {{ doc.name }}<br>
+                <b>তারিখ:</b> {{ frappe.utils.formatdate(frappe.utils.nowdate(), "dd MMMM, yyyy") }}<br>
+                <b>অবস্থান:</b> {{ doc.location or "Office Premises" }}
+            </div>
+        </div>
+    </div>
+
+    <div class="undertaking-section">
+        <span class="section-heading">অঙ্গীকারনামা (Terms of Undertaking)</span>
+        <div class="undertaking-text">
+            আমি নিম্নস্বাক্ষরকারী অঙ্গীকার করছি যে, অদ্য তারিখে আমার দাপ্তরিক কাজের সুবিধার্থে <b>{{ doc.company }}</b> এর পক্ষ হতে বর্ণিত সম্পদটি বুঝে নিলাম। উক্ত সম্পদ ব্যবহারকালীন সময়ে আমি নিম্নোক্ত শর্তসমূহ মেনে চলতে বাধ্য থাকব:
+            <ul style="margin-top: 12px; padding-left: 25px; line-height: 1.7;">
+                <li>উক্ত সম্পদটি শুধুমাত্র কোম্পানির দাপ্তরিক কাজে ব্যবহারের জন্য অনুমোদিত।</li>
+                <li>সম্পদটির পূর্ণ নিরাপত্তা এবং যথাযথ রক্ষণাবেক্ষণের দায়ভার ব্যক্তিগতভাবে আমার ওপর ন্যস্ত।</li>
+                <li>কর্তৃপক্ষের পূর্বানুমতি ব্যতীত হার্ডওয়্যার পরিবর্তন বা কোনো সফটওয়্যার কনফিগারেশন পরিবর্তন করা নিষিদ্ধ।</li>
+                <li>সম্পদটি হারিয়ে গেলে বা অবহেলাজনিত কারণে ক্ষতিগ্রস্ত হলে, আমি বর্তমান বাজার মূল্য অনুযায়ী পূর্ণ ক্ষতিপূরণ প্রদানে বাধ্য থাকব।</li>
+                <li>চাকরি ইস্তফা বা বদলির ক্ষেত্রে, আমি দায়বদ্ধতার সাথে সম্পদটি অ্যাডমিন বিভাগকে বুঝিয়ে দিয়ে ছাড়পত্র গ্রহণ করব।</li>
+            </ul>
+        </div>
+    </div>
+
+    <table class="specs-table">
+        <thead>
+            <tr>
+                <th colspan="2">সম্পদের কারিগরি বিবরণ (Technical Specifications)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="label-cell">অ্যাসেট নাম (Asset Name)</td>
+                <td class="value-cell">{{ doc.asset_name | upper }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">সিরিয়াল নম্বর (Serial No)</td>
+                <td class="value-cell" style="font-family: monospace;">{{ doc.serial_number or "NOT REGISTERED" }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">আইটেম কোড (Item Code)</td>
+                <td class="value-cell">{{ doc.item_code }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">ইনভয়েস তারিখ (Invoice Date)</td>
+                <td class="value-cell">{{ frappe.utils.formatdate(doc.purchase_date, "dd MMM yyyy") if doc.purchase_date else "N/A" }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">ব্যবহারযোগ্য তারিখ (Available Date)</td>
+                <td class="value-cell">{{ frappe.utils.formatdate(doc.available_for_use_date, "dd MMM yyyy") if doc.available_for_use_date else "N/A" }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">বর্তমান অবস্থা (Status)</td>
+                <td class="value-cell" style="font-weight: 800;">{{ doc.status | upper }}</td>
+            </tr>
+            {% if item_desc %}
+            <tr class="desc-row">
+                <td colspan="2" style="border-top: 2px solid #000;">
+                    <span class="desc-label">বিস্তারিত বিবরণ (Technical Description from Master)</span>
+                    <div style="line-height: 1.7; font-size: 12.5px; color: #1a1a1a;">
+                        {{ item_desc }}
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <div class="signature-row">
+        <div class="sig-block">
+            প্রদানকারীর স্বাক্ষর ও সীল<br>
+            <span style="font-size: 8px; font-weight: 400;">(Issuing Authority)</span>
+        </div>
+        <div class="sig-block">
+            গ্রহীতার স্বাক্ষর ও তারিখ<br>
+            <span style="font-size: 8px; font-weight: 400;">(Receiver's Acknowledgment)</span>
+        </div>
+    </div>
+
+    <div class="footer-reference">
+        This document serves as an official handover record. System generated on {{ frappe.utils.now_datetime().strftime('%d-%m-%Y %H:%M') }} by {{ frappe.session.user }}.
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+            <img class="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ frappe.utils.get_url() }}/app/asset/{{ doc.name }}" style="width:55px; height:55px;">
+    </div>
+</div>
+```
