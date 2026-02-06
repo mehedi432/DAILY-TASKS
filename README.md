@@ -148,7 +148,7 @@ function main(workbook: ExcelScript.Workbook) {
         display: grid;
         grid-template-columns: 1.5fr 1fr 1fr;
         grid-template-rows: 1fr 1fr;
-        gap: 12px; /* Slightly reduced gap */
+        gap: 13px; /* Slightly reduced gap */
         width: 100%;
         height: 135mm; 
         box-sizing: border-box;
@@ -171,9 +171,9 @@ function main(workbook: ExcelScript.Workbook) {
         display: flex; 
         align-items: center; 
         justify-content: space-between; 
-        margin-bottom: 4px;
+        margin-bottom: 5px;
         border-bottom: 2px solid #111;
-        padding-bottom: 4px;
+        padding-bottom: 5px;
         flex-shrink: 0;
     }
     
@@ -199,7 +199,7 @@ function main(workbook: ExcelScript.Workbook) {
 
     .qr-img { object-fit: contain; }
     .big-tag .qr-img { width: 55px; height: 55px; }
-    .small-tag .qr-img { width: 28px; height: 28px; }
+    .small-tag .qr-img { width: 21px; height: 21px; }
 
     .logo { object-fit: contain; }
     .big-tag .logo { width: 70px; }
@@ -250,8 +250,9 @@ function main(workbook: ExcelScript.Workbook) {
         <div class="footer">
             <div>DATE: {{ frappe.utils.formatdate(frappe.utils.nowdate(),"dd MMM yyyy") }}</div>
             <div style="font-weight:bold;">ID: {{ doc.name }}</div>
-            <div style="text-transform: lowercase;">{{ doc.designer or "" }}</div>
+            
         </div>
+        <div style="margin-top: 13px; text-align: center">DESIGNER: {{ frappe.db.get_value("Employee", doc.designer, "employee_name") | upper}}</div>
     </div>
 
     {% for i in range(4) %}
@@ -282,7 +283,7 @@ function main(workbook: ExcelScript.Workbook) {
 
         <div class="footer">
             <div style="font-weight:bold;">{{ doc.name[-5:] }}</div>
-            <div style="text-transform: lowercase;">{{ doc.designer or "" }}</div>
+            <div style="font-weight:bold; text-align: center">DESIGNER: {{ frappe.db.get_value("Employee", doc.designer, "employee_name") | upper}}</div>
             <div style="text-align: right;">#{{ i + 1 }}</div>
         </div>
     </div>
