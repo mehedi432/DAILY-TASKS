@@ -441,7 +441,7 @@ function main(workbook: ExcelScript.Workbook) {
 <style>
     @page {
         size: A4 portrait;
-        margin: 20mm;
+        margin: 10mm;
     }
 
     .letter-wrapper {
@@ -633,17 +633,17 @@ function main(workbook: ExcelScript.Workbook) {
         <div style="width: 48%;">
             <span class="section-heading">কর্মচারীর তথ্য (Employee Details)</span>
             <div style="line-height: 1.8;">
-                <b>নাম:</b> {{ emp_name }}<br>
-                <b>আইডি:</b> {{ doc.custodian or "---" }}<br>
-                <b>পদবী:</b> {{ emp_des }}<br>
-                <b>বিভাগ:</b> {{ doc.department or "---" }}
+                <b>নাম:</b> {{ emp_name|upper }}<br>
+                <b>আইডি:</b> {{ doc.custodian or "---" |upper }}<br>
+                <b>পদবী:</b> {{ emp_des| upper }}<br>
+                <b>বিভাগ:</b> {{ doc.department or "---"| upper }}
             </div>
         </div>
         <div style="width: 48%; text-align: right;">
             <span class="section-heading">নথি তথ্য (Document Reference)</span>
             <div style="line-height: 1.8;">
                 <b>রেফারেন্স নং:</b> {{ doc.name }}<br>
-                <b>তারিখ:</b> {{ frappe.utils.formatdate(frappe.utils.nowdate(), "dd MMMM, yyyy") }}<br>
+                <b>তারিখ:</b> {{ frappe.utils.formatdate(frappe.utils.nowdate(), "dd MMMM, yyyy" ) | upper }}<br>
                 <b>অবস্থান:</b> {{ doc.location or "Office Premises" }}
             </div>
         </div>
@@ -718,11 +718,28 @@ function main(workbook: ExcelScript.Workbook) {
         </div>
     </div>
 
-    <div class="footer-reference">
-        This document serves as an official handover record. System generated on {{ frappe.utils.now_datetime().strftime('%d-%m-%Y %H:%M') }} by {{ frappe.session.user }}.
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 50px; padding-top: 15px; border-top: 1px double #ccc;">
+    
+    <div style="width: 75%;">
+        <div style="font-size: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; color: #000; margin-bottom: 4px;">
+            Digital Audit Certificate
+        </div>
+        <div style="font-size: 9px; color: #444; line-height: 1.4; font-style: italic;">
+            This document is an official electronic record of <b>{{ doc.company }}</b> governance. <br>
+            System authenticated on <b>{{ frappe.utils.now_datetime().strftime('%d-%b-%Y | %H:%M') }}</b> 
+            by AuthID: <b>{{ frappe.session.user }}</b>.
+        </div>
     </div>
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-            <img class="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ frappe.utils.get_url() }}/app/asset/{{ doc.name }}" style="width:55px; height:55px;">
+
+    <div style="text-align: right;">
+        <div style="font-size: 7px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; color: #888;">
+            Scan to Verify Asset
+        </div>
+        <div style="display: inline-block; padding: 4px; border: 1px solid #000; background: #fff; line-height: 0;">
+            <img class="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ frappe.utils.get_url() }}/app/asset/{{ doc.name }}" 
+                 style="width: 60px; height: 60px; display: block;">
+        </div>
     </div>
+</div>
 </div>
 ```
