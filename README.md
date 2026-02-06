@@ -133,193 +133,312 @@ function main(workbook: ExcelScript.Workbook) {
 # Sample Yarn Tag
 ```
 <style>
-@page {
-  size: A4;
-}
-body {
-  -webkit-print-color-adjust: exact;
-}
+    @page {
+        size: A4 landscape;
+        margin: 8mm;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        font-family: 'Ubuntu Mono', monospace;
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 12px; /* Slightly reduced gap */
+        width: 100%;
+        height: 135mm; 
+        box-sizing: border-box;
+    }
+
+    .tag-container {
+        border: 1.6px solid #111;
+        border-radius: 13px;
+        padding: 8px; /* Reduced from 10px */
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .big-tag { grid-row: span 2; padding: 15px; }
+    
+    .header { 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between; 
+        margin-bottom: 4px;
+        border-bottom: 2px solid #111;
+        padding-bottom: 4px;
+        flex-shrink: 0;
+    }
+    
+    .title-area { text-align: center; flex: 1; }
+    .big-tag .title { font-size: 120%; font-weight: 900; letter-spacing: 1.6px; }
+    .small-tag .title { font-size: 11px; font-weight: 900; } /* Scaled down slightly */
+
+    .content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start; }
+    
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .underline { border-bottom: 1px solid #eee; }
+
+    .lbl { font-weight: 700; color: #555; text-transform: uppercase; width: 35%; }
+    .big-tag .lbl { font-size: 11px; padding: 4px 0; }
+    .small-tag .lbl { font-size: 7px; padding: 1px 0; } /* Tightened padding */
+
+    .val { font-weight: 800; color: #000; word-wrap: break-word; }
+    .big-tag .val { font-size: 13px; }
+    .small-tag .val { font-size: 8.5px; } /* Scaled down slightly */
+
+    .comp-val { line-height: 1.0; }
+    .small-tag .comp-val { font-size: 7.5px; }
+
+    .qr-img { object-fit: contain; }
+    .big-tag .qr-img { width: 55px; height: 55px; }
+    .small-tag .qr-img { width: 28px; height: 28px; }
+
+    .logo { object-fit: contain; }
+    .big-tag .logo { width: 70px; }
+    .small-tag .logo { width: 30px; }
+
+    .footer { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; /* Changed to center for better fit */
+        color: #444; 
+        margin-top: 3px;
+        padding-top: 2px;
+        border-top: 1px dashed #ccc;
+        flex-shrink: 0;
+        font-size: 7px;
+    }
+    .big-tag .footer { font-size: 9px; }
 </style>
 
-<div style="width:100%; font-family:'Inter','Segoe UI',Arial,sans-serif; padding:13px;">
+<div class="main-grid">
 
-  <div style="max-width:100%; margin:auto; border:1px solid #111; border-radius:13px; padding:13px; background:#fff;">
-
-    <!-- HEADER -->
-<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
-
-  <!-- LOGO (LEFT) -->
-  <div>
-    <img src="/files/logo_meek-01.png" style="height:55px; max-width:89px;">
-  </div>
-
-  <!-- TITLE (CENTER) -->
-  <div style="text-align:center; flex:1;">
-    <div style="font-size:34px; font-weight:800; letter-spacing:4px;">
-      YARN TAG
-    </div>
-    <div style="width:34%; height:1.6px; background:#111; margin:7px auto 0;"></div>
-  </div>
-
-  <!-- QR (RIGHT) -->
-    <div>
-      <img
-        src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://192.168.0.102:8003/app/daily-sample-request/{{ doc.name }}"
-        style="width:55px; height:55px;"
-        alt="QR">
-    </div>
-
-
-</div>
-
-
-    <!-- INFO -->
-    <table style="width:100%; border-collapse:collapse;">
-        
-      <tr>
-        <td style="font-size:13px; padding:10px 6px; font-weight:700; color:#555; width:30%;">BUYER</td>
-        <td style="font-size:21px; padding:10px 6px; font-weight:800;">
-          {{ doc.buyer or "" }}
-        </td>
-      </tr>
-      
-      <tr>
-        <td style="font-size:13px; padding:10px 6px; font-weight:700; color:#555; width:30%;">STYLE</td>
-        <td style="font-size:21px; padding:10px 6px; font-weight:800;">
-          {{ doc.style or "" }}
-        </td>
-      </tr>
-
-      <tr>
-        <td style="font-size:13px; padding:10px 6px; font-weight:700; color:#555;">COMPOSITION</td>
-        <td style="font-size:21px; padding:14px 6px;">
-          {% for y in doc.raw_material %}
-            {{ y.yarn_composition }} - {{ y.yarn_count }}{% if not loop.last %}, {% endif %}
-          {% endfor %}
-        </td>
-      </tr>
-
-      <tr style="margin-top: 21px;">
-        <td style="font-size:21px; padding:12px 6px; font-weight:700; color:#555;">SDO NO</td><br/>
-        <td style="font-size:21px; padding:22px 6px; border-bottom:1px solid #bbb;"></td>
-      </tr>
-
-      <tr style="margin-top: 21px;">
-        <td style="font-size:21px; padding:12px 6px; font-weight:700; color:#555;">DYE HOUSE</td>
-        <td style="font-size:21px; padding:23px 6px; border-bottom:1px solid #bbb;"></td>
-      </tr>
-
-      <tr style="margin-top: 21px;">
-        <td style="font-size:21px; padding:12px 6px; font-weight:700; color:#555;">LOT NO</td>
-        <td style="font-size:21px; padding:23px 6px; border-bottom:1px solid #bbb;"></td>
-      </tr>
-      <tr style="margin-top: 21px;">
-        <td style="font-size:21px; padding:12px 6px; font-weight:700; color:#555;">QTY.</td>
-        <td style="font-size:21px; padding:23px 6px; border-bottom:1px solid #bbb;"></td>
-      </tr>
-
-    </table>
-
-    <!-- FOOT -->
-    <div style="margin-top:18px; display:flex; justify-content:space-between; font-size:9px; color:#888;">
-      <div>RECEIVE DATE: {{ frappe.utils.formatdate(frappe.utils.nowdate(),"dd MMM yyyy") }}</div>
-      <div>{{ doc.name }}</div>
-    </div>
-
-  </div>
-
-</div>
-
-<div style="width:100%; font-family:'Inter','Segoe UI',Arial,sans-serif; padding:13px;">
-
-  <div style="max-width:100%; margin:auto; border:1px solid #111; border-radius:13px; padding:13px; background:#fff;">
-
-    <!-- HEADER -->
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
-    
-      <!-- LOGO (LEFT) -->
-      <div>
-        <img src="/files/logo_meek-01.png" style="height:55px; max-width:89px;">
-      </div>
-    
-      <!-- TITLE (CENTER) -->
-      <div style="text-align:center; flex:1;">
-        <div style="font-size:34px; font-weight:800; letter-spacing:4px;">
-          YARN TAG
+    <div class="tag-container big-tag">
+        <div class="header">
+            <img src="/files/logo_meek-01.png" class="logo">
+            <div class="title-area">
+                <div class="title">YARN TAG</div>
+            </div>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ frappe.utils.get_url() }}/app/daily-sample-request/{{ doc.name }}" class="qr-img">
         </div>
-        <div style="width:34%; height:1.6px; background:#111; margin:7px auto 0;"></div>
-      </div>
-    
-      <!-- QR (RIGHT) -->
-        <div>
-          <img
-            src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://192.168.0.102:8003/app/daily-sample-request/{{ doc.name }}"
-            style="width:55px; height:55px;"
-            alt="QR">
+
+        <div class="content-area">
+            <table>
+                <tr class="underline"><td class="lbl">BUYER</td><td class="val">{{ doc.buyer or "" }}</td></tr>
+                <tr class="underline"><td class="lbl">STYLE</td><td class="val">{{ doc.style or "" }}</td></tr>
+                <tr class="underline">
+                    <td class="lbl">COMPOSITION</td>
+                    <td class="val comp-val">
+                        {% for y in doc.raw_material %}{{ y.yarn_composition }} {{ y.yarn_count }}{% if not loop.last %}, {% endif %}{% endfor %}
+                    </td>
+                </tr>
+                <tr class="underline"><td class="lbl">SSO NO</td><td class="val"></td></tr>
+                <tr class="underline"><td class="lbl">DYE HOUSE</td><td class="val"></td></tr>
+                <tr class="underline"><td class="lbl">LOT NO</td><td class="val"></td></tr>
+                <tr><td class="lbl">QUANTITY</td><td class="val"></td></tr>
+            </table>
         </div>
-    
-    
+
+        <div class="footer">
+            <div>DATE: {{ frappe.utils.formatdate(frappe.utils.nowdate(),"dd MMM yyyy") }}</div>
+            <div style="font-weight:bold;">ID: {{ doc.name }}</div>
+            <div style="text-transform: lowercase;">{{ doc.designer or "" }}</div>
+        </div>
     </div>
 
+    {% for i in range(4) %}
+    <div class="tag-container small-tag">
+        <div class="header">
+            <img src="/files/logo_meek-01.png" class="logo">
+            <div class="title-area">
+                <div class="title">YARN TAG</div>
+            </div>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ frappe.utils.get_url() }}/app/daily-sample-request/{{ doc.name }}" class="qr-img">
+        </div>
 
-    <!-- INFO -->
-    <table style="width:100%; border-collapse:collapse;">
-        
-      <tr>
-        <td style="font-size:13px; padding:10px 6px; font-weight:700; color:#555; width:30%;">BUYER</td>
-        <td style="font-size:21px; padding:10px 6px; font-weight:800;">
-          {{ doc.buyer or "" }}
-        </td>
-      </tr>
-      
-      <tr>
-        <td style="font-size:13px; padding:10px 6px; font-weight:700; color:#555; width:30%;">STYLE</td>
-        <td style="font-size:21px; padding:10px 6px; font-weight:800;">
-          {{ doc.style or "" }}
-        </td>
-      </tr>
+        <div class="content-area">
+            <table>
+                <tr class="underline"><td class="lbl">BUYER</td><td class="val">{{ (doc.buyer or "")[:15] }}</td></tr>
+                <tr class="underline"><td class="lbl">STYLE</td><td class="val">{{ (doc.style or "")[:15] }}</td></tr>
+                <tr class="underline">
+                    <td class="lbl">COMP</td>
+                    <td class="val comp-val">
+                        {% for y in doc.raw_material %}{{ y.yarn_composition }} {{ y.yarn_count }}{% if not loop.last %}, {% endif %}{% endfor %}
+                    </td>
+                </tr>
+                <tr class="underline"><td class="lbl">SSO</td><td class="val"></td></tr>
+                <tr class="underline"><td class="lbl">LOT</td><td class="val"></td></tr>
+                
+            </table>
+        </div>
 
-      <tr>
-        <td style="font-size:13px; padding:10px 6px; font-weight:700; color:#555;">COMPOSITION</td>
-        <td style="font-size:21px; padding:14px 6px;">
-          {% for y in doc.raw_material %}
-            {{ y.yarn_composition }} - {{ y.yarn_count }}{% if not loop.last %}, {% endif %}
-          {% endfor %}
-        </td>
-      </tr>
-
-      <tr style="margin-top: 21px;">
-        <td style="font-size:21px; padding:12px 6px; font-weight:700; color:#555;">SDO NO</td><br/>
-        <td style="font-size:21px; padding:22px 6px; border-bottom:1px solid #bbb;"></td>
-      </tr>
-
-      <tr style="margin-top: 21px;">
-        <td style="font-size:21px; padding:12px 6px; font-weight:700; color:#555;">DYE HOUSE</td>
-        <td style="font-size:21px; padding:23px 6px; border-bottom:1px solid #bbb;"></td>
-      </tr>
-
-      <tr style="margin-top: 21px;">
-        <td style="font-size:21px; padding:12px 6px; font-weight:700; color:#555;">LOT NO</td>
-        <td style="font-size:21px; padding:23px 6px; border-bottom:1px solid #bbb;"></td>
-      </tr>
-      <tr style="margin-top: 21px;">
-        <td style="font-size:21px; padding:12px 6px; font-weight:700; color:#555;">QTY.</td>
-        <td style="font-size:21px; padding:23px 6px; border-bottom:1px solid #bbb;"></td>
-      </tr>
-
-    </table>
-
-    <!-- FOOT -->
-    <div style="margin-top:18px; display:flex; justify-content:space-between; font-size:9px; color:#888;">
-      <div>RECEIVE DATE: {{ frappe.utils.formatdate(frappe.utils.nowdate(),"dd MMM yyyy") }}</div>
-      <div>{{ doc.name }}</div>
+        <div class="footer">
+            <div style="font-weight:bold;">{{ doc.name[-5:] }}</div>
+            <div style="text-align: center; text-transform: lowercase; font-weight: bold;">
+                {{ frappe.db.get_value("User", doc.designer, "full_name") }}
+            </div>
+            <div style="text-align: right;">#{{ i + 1 }}</div>
+        </div>
     </div>
-
-  </div>
+    {% endfor %}
 
 </div>
 ```
-ASSET TRANSFER ACKNOWLEDGEMENT -
+
+# ASSET QR TAG
+```
+<style>
+    @page {
+        size: A4 landscape;
+        margin: 5mm;
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Ubuntu Mono', monospace;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .main-wrapper {
+        display: grid;
+        /* Golden Ratio split: 1.618:1:1 approx */
+        grid-template-columns: 1.618fr 1fr 1fr; 
+        grid-template-rows: 1fr 1fr;
+        gap: 13px; /* Fibonacci */
+        width: 100%;
+        height: 135mm; 
+        box-sizing: border-box;
+        padding: 8px; /* Fibonacci */
+    }
+    
+    .tag-card {
+        border: 1px solid #111;
+        border-radius: 8px; /* Fibonacci */
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .big-card {
+        grid-row: span 2;
+        padding: 21px; /* Fibonacci Anchor */
+        border-width: 1.6px;
+    }
+
+    .small-card {
+        padding: 8px; /* Fibonacci */
+        border-width: .6px;
+    }
+
+    /* TYPOGRAPHY SCALING (Golden Ratio & Fibonacci) */
+    /* Big Card: Title 21px -> Val 13px (21/1.618) -> Lbl 8px (13/1.618) */
+    .big-card .title { font-size: 21px; font-weight: 800; line-height: 1.2; flex-shrink: 0; }
+    .big-card .lbl { font-size: 11px; color: #555; font-weight: 700; width: 34%; }
+    .big-card .val { font-size: 13px; font-weight: 800; line-height: 1.1; word-wrap: break-word; }
+
+    /* Small Card: Title 13px -> Val 8px (13/1.618) -> Lbl 5px (8/1.618) */
+    .small-card .title { font-size: 13px; font-weight: 800; flex-shrink: 0; }
+    .small-card .lbl { font-size: 7px; color: #555; font-weight: 700; width: 34%; }
+    .small-card .val { font-size: 8px; font-weight: 700; line-height: 1.1; }
+
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; flex-grow: 1; }
+    .underline { border-bottom: 1px solid #eee; }
+    
+    /* Dynamic Spacing using Flex */
+    .table-container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Centers table vertically in available space */
+    }
+
+    .big-card tr td { padding: 1.618% 0; } /* Golden Ratio padding */
+    .small-card tr td { padding: 1% 0; }
+
+    img.qr { background: white; border: 1px solid #eee; object-fit: contain; flex-shrink: 0; }
+    
+    .footer-note {
+        font-size: 8px; /* Fibonacci */
+        color: #333;
+        text-align: center;
+        font-weight: bold;
+        border-top: 1px solid #111;
+        margin-top: 5px; 
+        padding-top: 5px; 
+        flex-shrink: 0;
+    }
+</style>
+
+{# --- DYNAMIC DATA LOGIC --- #}
+{% set emp_name = frappe.db.get_value("Employee", doc.custodian, "employee_name") if doc.custodian else "" %}
+{% set emp_dept = frappe.db.get_value("Employee", doc.custodian, "department") if doc.custodian else "" %}
+{% set final_dept = doc.department or emp_dept or "GENERAL" %}
+
+<div class="main-wrapper">
+    
+    <div class="tag-card big-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <img src="/files/logo_meek-01.png" style="height:34px; width: auto;" onerror="this.style.display='none'">
+            <img class="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ frappe.utils.get_url() }}/app/asset/{{ doc.name }}" style="width:55px; height:55px;">
+        </div>
+        
+        <div style="text-align:center; margin: 8px 0;">
+            <div class="title">ASSET IDENTIFICATION</div>
+            <div style="width:55%; height:2px; background:#111; margin:5px auto;"></div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <tr class="underline"><td class="lbl">ID</td><td class="val">{{ doc.name }}</td></tr>
+                <tr class="underline"><td class="lbl">NAME</td><td class="val">{{ doc.asset_name | upper }}</td></tr>
+                <tr class="underline"><td class="lbl">DEPT</td><td class="val">{{ final_dept | upper }}</td></tr>
+                <tr class="underline"><td class="lbl">CUSTODIAN</td><td class="val">{{ emp_name | upper or "UNASSIGNED" }}</td></tr>
+                <tr class="underline"><td class="lbl">LOCATION</td><td class="val">{{ doc.location or "---" }}</td></tr>
+                <tr><td class="lbl">PURCHASE</td><td class="val">{{ frappe.utils.formatdate(doc.purchase_date, "dd MMM yyyy") if doc.purchase_date else "---" }}</td></tr>
+            </table>
+        </div>
+        
+        <div class="footer-note">PROPERTY OF {{ doc.company | upper }}</div>
+    </div>
+
+    {% for i in range(4) %}
+    <div class="tag-card small-card">
+        <div style="display:flex; justify-content:space-between; align-items:start;">
+            <div class="title">ASSET TAG</div>
+            <img class="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ frappe.utils.get_url() }}/app/asset/{{ doc.name }}" style="width:34px; height:34px;">
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <tr class="underline"><td class="lbl">ID</td><td class="val">{{ doc.name }}</td></tr>
+                <tr class="underline"><td class="lbl">DEPT</td><td class="val">{{ final_dept[:13] | upper }}</td></tr>
+                <tr class="underline"><td class="lbl">CUST</td><td class="val">{{ (emp_name.split(' ')[0]) | upper if emp_name else "N/A" }}</td></tr>
+                <tr><td class="lbl">NAME</td><td class="val">{{ doc.asset_name[:21] | upper }}</td></tr>
+            </table>
+        </div>
+
+        <div style="font-size:8px; color:#999; text-align:right; border-top:1px solid #eee; padding-top:3px;">
+            {{ doc.name }}
+        </div>
+        <div class="footer-note">PROPERTY OF {{ doc.company | upper }}</div>
+    </div>
+    {% endfor %}
+
+</div>
+```
+
+# ASSET TRANSFER ACKNOWLEDGEMENT -
 ```
 <style>
     @page {
