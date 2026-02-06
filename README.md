@@ -130,7 +130,7 @@ function main(workbook: ExcelScript.Workbook) {
 }
 ```
 
-# Sample Yarn Tag
+# Sample Yarn QR Tag
 ```
 <style>
     @page {
@@ -252,7 +252,7 @@ function main(workbook: ExcelScript.Workbook) {
             <div style="font-weight:bold;">ID: {{ doc.name }}</div>
             
         </div>
-        <div style="margin-top: 13px; text-align: center">DESIGNER: {{ frappe.db.get_value("Employee", doc.designer, "employee_name") | upper}}</div>
+        <div style="font-weight:bold; margin-top: 13px; text-align: center; font-size: 10px;">DESIGNER: {{ frappe.db.get_value("Employee", doc.designer, "employee_name") | upper}} - {{doc.designer}}</div>
     </div>
 
     {% for i in range(4) %}
@@ -283,8 +283,13 @@ function main(workbook: ExcelScript.Workbook) {
 
         <div class="footer">
             <div style="font-weight:bold;">{{ doc.name[-5:] }}</div>
-            <div style="font-weight:bold; text-align: center">DESIGNER: {{ frappe.db.get_value("Employee", doc.designer, "employee_name") | upper}}</div>
+            <div>DATE: {{ frappe.utils.formatdate(frappe.utils.nowdate(),"dd MMM yyyy") | upper }}</div>
             <div style="text-align: right;">#{{ i + 1 }}</div>
+        </div>
+        <div class="footer">
+            <div style="font-weight:bold;">-</div>
+            <div style="font-weight:bold; text-align: center">DESIGNER: {{ frappe.db.get_value("Employee", doc.designer, "employee_name") | upper}} - {{doc.designer}}</div>
+            <div style="font-weight:bold;">-</div>
         </div>
     </div>
     {% endfor %}
