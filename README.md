@@ -282,9 +282,7 @@ function main(workbook: ExcelScript.Workbook) {
 
         <div class="footer">
             <div style="font-weight:bold;">{{ doc.name[-5:] }}</div>
-            <div style="text-align: center; text-transform: lowercase; font-weight: bold;">
-                {{ frappe.db.get_value("User", doc.designer, "full_name") }}
-            </div>
+            <div style="text-transform: lowercase;">{{ doc.designer or "" }}</div>
             <div style="text-align: right;">#{{ i + 1 }}</div>
         </div>
     </div>
